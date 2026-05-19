@@ -80,3 +80,27 @@ python app.py
 1. **Planner Agent**: Analyzes the user's task and formulates a step-by-step plan.
 2. **Tool Selector Agent**: Classifies the task to determine which tool (email, linkedin, summary, or general) is best suited to achieve the goal.
 3. **Executor Agent**: Takes the plan and the chosen tool, then executes the task to produce the final output.
+
+## 📦 Deployment
+
+To make deployment easy and avoid Python 3.14 protobuf C-extension issues, this project targets Python 3.11.
+
+- `Procfile`: starts the Streamlit app for platforms like Heroku or Render.
+- `runtime.txt`: pins the Python runtime to `python-3.11.6`.
+
+Quick deploy steps (Render / Heroku):
+
+1. Create the app on your chosen platform.
+2. Push this repository to the connected Git remote.
+3. The platform will install dependencies from `requirements.txt` and use `runtime.txt` for Python version.
+
+Local test commands:
+```bash
+python -m venv venv
+# Activate the venv (Windows):
+venv\Scripts\activate
+pip install -r requirements.txt
+streamlit run streamlit_app.py
+```
+
+If you hit protobuf-related errors on newer Python versions, ensure the deployed runtime is Python 3.11.

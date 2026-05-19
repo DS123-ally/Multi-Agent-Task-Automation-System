@@ -1,6 +1,6 @@
 langchain-core==0.2.43
 langchain-groq==0.1.10
-langgraph==0.0.14
+langgraph==0.2.76
 streamlit==1.32.2
 python-dotenv==1.0.0
 pandas
