@@ -1,6 +1,13 @@
+langchain==0.2.16
 langchain-core==0.2.43
+langchain-community==0.2.16
 langchain-groq==0.1.10
+<<<<<<< HEAD
 langgraph==0.2.76
+=======
+langgraph==0.2.16
+
+>>>>>>> c16298616c92b340546673186379626b3a9484cb
 streamlit==1.32.2
 python-dotenv==1.0.0
 pandas
