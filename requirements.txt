@@ -6,3 +6,5 @@ langgraph==0.2.76
 streamlit==1.32.2
 python-dotenv==1.0.0
 pandas
+tavily-python
+wikipedia

@@ -55,6 +55,8 @@ if "task_history" not in st.session_state:
     st.session_state.task_history = []
 if "current_task" not in st.session_state:
     st.session_state.current_task = None
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
 # Helper functions
 def get_tool_icon(tool: str) -> str:
@@ -63,6 +65,7 @@ def get_tool_icon(tool: str) -> str:
         "email": "📧",
         "linkedin": "💼",
         "summary": "📝",
+        "research": "🔍",
         "general": "🔧"
     }
     return icons.get(tool.lower(), "🔧")
@@ -80,7 +83,15 @@ def execute_task(task_input: str) -> Dict:
     """Execute task using the agent graph"""
     start_time = time.time()
     try:
-        result = graph.invoke({"input": task_input})
+        result = graph.invoke({
+            "input": task_input,
+            "chat_history": st.session_state.chat_history
+        })
+        
+        # Update memory
+        st.session_state.chat_history.append(f"User: {task_input}")
+        st.session_state.chat_history.append(f"Agent: {result.get('output', 'No output generated')}")
+        
         duration = time.time() - start_time
         
         return {
@@ -162,6 +173,7 @@ with st.sidebar:
             "📧 Email": "Professional email composition",
             "💼 LinkedIn": "LinkedIn posts and content",
             "📝 Summary": "Text summarization",
+            "🔍 Research": "Web search and fact checking",
             "🔧 General": "Any other task"
         }
         for tool, description in tools_info.items():
@@ -178,6 +190,7 @@ with st.sidebar:
         if st.button("🗑️ Clear All", use_container_width=True):
             st.session_state.task_history = []
             st.session_state.current_task = None
+            st.session_state.chat_history = []
             st.rerun()
 
 # Main content
