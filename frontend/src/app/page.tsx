@@ -269,7 +269,7 @@ export default function Home() {
                   </button>
                   <button 
                     onClick={(e) => deleteConversation(conv.id, e)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
                     title="Delete Conversation"
                   >
                     <Trash2 className="w-4 h-4" />
