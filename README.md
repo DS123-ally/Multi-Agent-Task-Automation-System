@@ -1,106 +1,90 @@
-# Multi-Agent Task Automation System
+# Agent OS - Multi-Agent Task Automation System
 
-A powerful, AI-driven task automation system that utilizes multiple specialized agents to plan, select tools, and execute various requests. Powered by **LangChain**, **LangGraph**, **Groq (Llama-3)**, and **Streamlit**.
+A powerful, AI-driven autonomous agent system that utilizes specialized agents to plan, select tools, and execute various requests. 
+
+This project is built using a modern decoupled architecture:
+- **Frontend**: Next.js (React), Tailwind CSS, Firebase Authentication, and Firestore Database.
+- **Backend**: FastAPI, Python 3.11, LangChain, LangGraph, and Groq (Llama-3).
 
 ## 🚀 Features
 
 - **Multi-Agent Workflow**: Utilizes specialized agents (Planner, Tool Selector, Executor) working together through LangGraph.
-- **Smart Tool Selection**: Automatically classifies user tasks and uses the best-suited tool (e.g., Email Composition, LinkedIn Posts, Summarization, or General Tasks).
-- **Web Interface**: A beautiful and interactive Streamlit UI to enter tasks, view execution steps, and monitor analytics.
-- **CLI Mode**: A lightweight Command-Line Interface (`app.py`) for quick testing and execution.
+- **Smart Tool Selection**: Automatically classifies user tasks and uses the best-suited tool (e.g., Web Research via Tavily, Email Composition, LinkedIn Posts, Summarization, or General Tasks).
+- **ChatGPT-Style Web Interface**: A beautiful Next.js UI with real-time Firestore syncing, a collapsible sidebar, and conversation threading.
 - **Fast Inference**: Powered by Groq's high-speed inference engine using the `llama-3.1-8b-instant` model.
 
 ## 🛠️ Technologies Used
 
-- **Python 3.10+**
-- **LangChain & LangGraph**: For defining the state machine and connecting the agents.
-- **Groq API**: For lightning-fast LLM responses.
-- **Streamlit**: For the web-based user interface.
+- **Frontend**: Next.js, React, Tailwind CSS, Firebase (Auth & Firestore)
+- **Backend**: Python 3.11, FastAPI, Uvicorn
+- **AI Stack**: LangChain, LangGraph, Groq API, Tavily API (Search)
+- **Deployment**: Render (Backend - Docker), Firebase Hosting (Frontend)
 
 ## 📁 Project Structure
 
 ```
-├── app.py                # Command-Line Interface (CLI) entrypoint
-├── streamlit_app.py      # Streamlit Web UI entrypoint
+├── frontend/             # Next.js Application
+│   ├── src/app/          # React components and pages
+│   └── src/lib/          # Firebase configuration
+│
+├── main.py               # FastAPI backend entrypoint
 ├── graph.py              # LangGraph state machine definition
 ├── nodes.py              # Logic for Planner, Tool Selector, and Executor agents
-├── tools.py              # Specific implementations for tools (email, linkedin, summary)
+├── tools.py              # Specific implementations for tools
 ├── requirements.txt      # Python dependencies
+├── Dockerfile            # Container definition for the backend
+├── render.yaml           # Blueprint for automatic Render deployment
 └── .env                  # Environment variables (API Keys)
 ```
 
-## ⚙️ Setup Instructions
+## ⚙️ Local Setup Instructions
 
-### 1. Clone the Repository
-```bash
-git clone <your-repository-url>
-cd Multi-Agent System
-```
-
-### 2. Create a Virtual Environment
-It's recommended to run the project in a virtual environment.
+### 1. Backend (FastAPI)
+Open a terminal in the root directory:
 ```bash
 python -m venv venv
+venv\Scripts\activate      # Windows
+source venv/bin/activate   # macOS/Linux
 
-# On Windows:
-venv\Scripts\activate
-
-# On macOS/Linux:
-source venv/bin/activate
-```
-
-### 3. Install Dependencies
-```bash
 pip install -r requirements.txt
 ```
-
-### 4. Set Environment Variables
-Create a `.env` file in the root directory and add your Groq API Key:
+Create a `.env` file in the root directory and add your API Keys:
 ```env
 GROQ_API_KEY=your_groq_api_key_here
+TAVILY_API_KEY=your_tavily_api_key_here
 ```
-
-## ▶️ How to Run
-
-### Option 1: Streamlit Web UI (Recommended)
-Launch the interactive web application, which includes a graphical task executor, historical task tracking, and analytics.
+Run the backend server:
 ```bash
-streamlit run streamlit_app.py
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
-*The app will be available at http://localhost:8501*
 
-### Option 2: Command-Line Interface (CLI)
-For a quick, text-based execution without a web UI:
+### 2. Frontend (Next.js)
+Open a new terminal in the `frontend` directory:
 ```bash
-python app.py
+cd frontend
+npm install
+npm run dev
 ```
+*The web app will be available at http://localhost:3000*
 
-## 🧠 How it Works
+## 📦 Deployment Instructions
 
-1. **Planner Agent**: Analyzes the user's task and formulates a step-by-step plan.
-2. **Tool Selector Agent**: Classifies the task to determine which tool (email, linkedin, summary, or general) is best suited to achieve the goal.
-3. **Executor Agent**: Takes the plan and the chosen tool, then executes the task to produce the final output.
+### Backend (Render & Docker)
+The backend is completely containerized and configured for automatic deployment on Render using Infrastructure as Code (`render.yaml`).
 
-## 📦 Deployment
+1. Push this repository to GitHub.
+2. Go to [Render.com](https://render.com) and create a New **Blueprint**.
+3. Connect your GitHub repository. Render will read the `render.yaml` file, detect the `Dockerfile`, and automatically build the web service.
+4. Render will prompt you for your `GROQ_API_KEY` and `TAVILY_API_KEY`.
+5. Once live, copy your backend URL (e.g., `https://agent-os-backend.onrender.com`).
 
-To make deployment easy and avoid Python 3.14 protobuf C-extension issues, this project targets Python 3.11.
-
-- `Procfile`: starts the Streamlit app for platforms like Heroku or Render.
-- `runtime.txt`: pins the Python runtime to `python-3.11.6`.
-
-Quick deploy steps (Render / Heroku):
-
-1. Create the app on your chosen platform.
-2. Push this repository to the connected Git remote.
-3. The platform will install dependencies from `requirements.txt` and use `runtime.txt` for Python version.
-
-Local test commands:
+### Frontend (Firebase Hosting)
+1. Update your Next.js Axios configuration in `frontend/src/app/page.tsx` to point to your new Render backend URL instead of localhost.
+2. Build the Next.js app:
 ```bash
-python -m venv venv
-# Activate the venv (Windows):
-venv\Scripts\activate
-pip install -r requirements.txt
-streamlit run streamlit_app.py
+npm run build
 ```
-
-If you hit protobuf-related errors on newer Python versions, ensure the deployed runtime is Python 3.11.
+3. Deploy to Firebase:
+```bash
+firebase deploy --only hosting
+```
