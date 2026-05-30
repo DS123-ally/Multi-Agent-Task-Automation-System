@@ -8,3 +8,5 @@ python-dotenv==1.0.0
 pandas
 tavily-python
 wikipedia
+fastapi
+uvicorn

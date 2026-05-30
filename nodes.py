@@ -123,13 +123,45 @@ def summary_executor(state):
     )
 
 def research_executor(state):
-    return _base_execute(
-        state, 
-        "research", 
-        research_tool, 
-        "Synthesize the research results to answer the user's task comprehensively.",
-        arg_key="query"
-    )
+    user_input = state["input"]
+    plan = state["plan"]
+    chat_history = "\n".join(state.get("chat_history", []))
+    
+    # 1. Generate a precise search query
+    query_prompt = f"""
+    Extract a precise, 3-5 word Google search query from the user's task.
+    Do not include conversational words. Only output the search query.
+    Task: {user_input}
+    """
+    search_query = llm.invoke([HumanMessage(content=query_prompt)]).content.strip()
+    
+    # 2. Execute the tool with the precise query
+    try:
+        tool_result = research_tool.invoke({"query": search_query})
+    except Exception as e:
+        tool_result = f"Tool execution failed: {str(e)}"
+        
+    # 3. Generate final output with strict URL instructions
+    prompt = f"""
+    You are an executor agent.
+    
+    Previous Conversation History:
+    {chat_history}
+    
+    Task: {user_input}
+    Plan: {plan}
+    Search Query Used: {search_query}
+    
+    Tool Result / Context:
+    {tool_result}
+    
+    Synthesize the research results to answer the user's task comprehensively. 
+    CRITICAL: YOU MUST INCLUDE the source URLs/links provided in the tool results. 
+    However, ONLY provide URLs that are highly authoritative, reliable, and directly related to the topic. 
+    If a URL looks like spam, is irrelevant, or seems inaccessible, DO NOT include it.
+    """
+    response = llm.invoke([HumanMessage(content=prompt)])
+    return {"output": response.content}
 
 def general_executor(state):
     user_input = state["input"]
