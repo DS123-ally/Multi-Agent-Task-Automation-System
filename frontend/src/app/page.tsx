@@ -2,12 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { Send, Clock, BrainCircuit, Wrench, Briefcase, Mail, FileText, Search, ChevronDown, ChevronRight, User, LogOut, Plus, MessageSquare, Menu, X, PanelLeft } from "lucide-react";
+import { Send, Clock, BrainCircuit, Wrench, Briefcase, Mail, FileText, Search, ChevronDown, ChevronRight, User, LogOut, Plus, MessageSquare, Menu, X, PanelLeft, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useAuth } from "@/context/AuthContext";
 import { auth, db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
-import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, setDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { Login } from "@/components/Login";
 
 type Role = "user" | "agent";
@@ -109,6 +109,15 @@ export default function Home() {
       case "research": return <Search className="w-4 h-4 text-emerald-500" />;
       default: return <Wrench className="w-4 h-4 text-gray-500" />;
     }
+  };
+
+  const deleteConversation = async (convId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) return;
+    if (activeConversationId === convId) {
+      setActiveConversationId(null);
+    }
+    await deleteDoc(doc(db, "users", user.uid, "conversations", convId));
   };
 
   const handleExecute = async () => {
@@ -241,21 +250,31 @@ export default function Home() {
               <div className="text-sm text-slate-500 px-3 py-4 text-center">No past conversations</div>
             ) : (
               conversations.map(conv => (
-                <button
-                  key={conv.id}
-                  onClick={() => {
-                    setActiveConversationId(conv.id);
-                    if (window.innerWidth < 768) setIsSidebarOpen(false);
-                  }}
-                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm transition-colors text-left group ${
-                    activeConversationId === conv.id 
-                      ? "bg-slate-800 text-slate-100 font-medium" 
-                      : "text-slate-400 hover:bg-slate-900/50 hover:text-slate-200"
-                  }`}
-                >
-                  <MessageSquare className={`w-4 h-4 shrink-0 ${activeConversationId === conv.id ? "text-indigo-400" : "text-slate-500 group-hover:text-slate-400"}`} />
-                  <span className="truncate">{conv.title}</span>
-                </button>
+                <div key={conv.id} className="relative group w-full">
+                  <button
+                    onClick={() => {
+                      setActiveConversationId(conv.id);
+                      if (window.innerWidth < 768) setIsSidebarOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between gap-3 px-3 py-3 rounded-xl text-sm transition-colors text-left ${
+                      activeConversationId === conv.id 
+                        ? "bg-slate-800 text-slate-100 font-medium pr-10" 
+                        : "text-slate-400 hover:bg-slate-900/50 hover:text-slate-200 pr-10"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      <MessageSquare className={`w-4 h-4 shrink-0 ${activeConversationId === conv.id ? "text-indigo-400" : "text-slate-500 group-hover:text-slate-400"}`} />
+                      <span className="truncate">{conv.title}</span>
+                    </div>
+                  </button>
+                  <button 
+                    onClick={(e) => deleteConversation(conv.id, e)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                    title="Delete Conversation"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               ))
             )}
           </div>
