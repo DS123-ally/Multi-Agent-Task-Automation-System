@@ -149,7 +149,7 @@ export default function Home() {
     );
 
     try {
-      const res = await axios.post("http://localhost:8000/execute", {
+      const res = await axios.post("https://multi-agent-task-automation-system-3.onrender.com/execute", {
         input: content,
         chat_history: chatHistory
       });
@@ -386,7 +386,7 @@ export default function Home() {
   );
 }
 
-function ChatMessage({ msg, getToolIcon }: { msg: Message, getToolIcon: (t: string) => JSX.Element }) {
+function ChatMessage({ msg, getToolIcon }: { msg: Message, getToolIcon: (t: string) => React.ReactNode }) {
   const isUser = msg.role === "user";
   const [showThought, setShowThought] = useState(false);
 
